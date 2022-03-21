@@ -22,8 +22,7 @@ public class Student //TODO consider implementing any interfaces necessary for y
     public LocalDate getDateOfBirth() { return dateOfBirth; }
 
     public String getDetails() { return details; }
-
-    /*
+/*
     TODO consider overriding any methods for this object to function properly within a collection:
         1. A student is considered unique by a combination of their name and dateOfBirth
         2. Student names are sorted alphabetically, if two students have the same name, then the older one is
