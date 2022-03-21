@@ -50,7 +50,7 @@ public class StudentList implements List<Student> {
 
     @Override
     public boolean isEmpty() {
-        return this.size <= 0;
+        return this.size == 0;
     }
 
     @Override
