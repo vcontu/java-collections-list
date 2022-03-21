@@ -1,5 +1,6 @@
 package com.endava.internship.collections;
 
+
 import java.util.*;
 
 public class StudentList implements List<Student> {
@@ -17,8 +18,8 @@ public class StudentList implements List<Student> {
             this.capacity = initialCapacity;
             this.array = new Student[this.capacity];
         } else {
-            if (initialCapacity != 0) {
-                throw new IllegalArgumentException();
+            if (initialCapacity <= 0) {
+                throw new IllegalArgumentException("Initial capacity must be greater than 0");
             }
 
             this.capacity = 10;
@@ -28,8 +29,8 @@ public class StudentList implements List<Student> {
     }
 
     public StudentList(Collection<? extends Student> collection) {
-        if (collection == null) {
-            throw new NullPointerException();
+        if (!Objects.nonNull(collection)) {
+            throw new IllegalArgumentException("Collection does not exists");
         } else {
             this.size = collection.size();
             this.capacity = this.size * 2;
@@ -56,14 +57,14 @@ public class StudentList implements List<Student> {
     @Override
     public boolean contains(Object o) {
         boolean flag = false;
-
-        for(int i = 0; i < this.size; i++) {
-            if (o.equals(this.array[i])) {
-                flag = true;
-                break;
+        if(Objects.nonNull(o)){
+            for(int i = 0; i < this.size; i++) {
+                if (o.equals(this.array[i])) {
+                    flag = true;
+                    break;
+                }
             }
         }
-
         return flag;
     }
 
@@ -84,26 +85,30 @@ public class StudentList implements List<Student> {
 
     @Override
     public boolean add(Student student) {
-        if ((size + size/2)>=capacity) {
-            this.capacity *= 2;
+        if(Objects.nonNull(student)){
+            if ((size + size/2)>=capacity) {
+                this.capacity *= 2;
+            }
+
+            ++this.size;
+            Student[] arr = new Student[this.capacity];
+
+            for(int i = 0; i < this.size - 1; ++i) {
+                arr[i] = this.array[i];
+            }
+
+            arr[this.size - 1] = student;
+            this.array = arr;
+            return true;
         }
 
-        ++this.size;
-        Student[] arr = new Student[this.capacity];
-
-        for(int i = 0; i < this.size - 1; ++i) {
-            arr[i] = this.array[i];
-        }
-
-        arr[this.size - 1] = student;
-        this.array = arr;
         return false;
     }
 
     @Override
     public boolean remove(Object o) {
         boolean flag = false;
-        if (o != null) {
+        if (Objects.nonNull(o)) {
             for(int i = 0; i < this.size; ++i) {
                 if (o.equals(this.array[i])) {
                     flag = true;
@@ -113,9 +118,8 @@ public class StudentList implements List<Student> {
                     this.array[i] = this.array[i + 1];
                 }
             }
+            --this.size;
         }
-
-        --this.size;
         return flag;
     }
 
@@ -131,7 +135,7 @@ public class StudentList implements List<Student> {
     @Override
     public Student get(int i) {
         if (i > this.size && i < 0) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException(" Index is out of bounds");
         } else {
             return this.array[i];
         }
@@ -139,13 +143,13 @@ public class StudentList implements List<Student> {
 
     @Override
     public Student set(int i, Student student) {
-        if (i >= 0 && i < this.size) {
-            Student previous = this.array[i];
-            this.array[i] = student;
-            return previous;
-        } else {
-            throw new IndexOutOfBoundsException();
-        }
+            if (i >= 0 && i < this.size) {
+                Student previous = this.array[i];
+                this.array[i] = student;
+                return previous;
+            } else {
+                throw new IndexOutOfBoundsException("Index is greater than size of ArrayList or smaller than 0");
+            }
     }
 
     @Override
@@ -158,7 +162,7 @@ public class StudentList implements List<Student> {
             this.array[index] = student;
             ++this.size;
         } else {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("The index passes by you is invalid");
         }
     }
 
@@ -174,23 +178,20 @@ public class StudentList implements List<Student> {
             --this.size;
             return previous;
         } else {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("The index passes by you is invalid");
         }
     }
 
     @Override
     public int indexOf(Object o) {
-        int index = -1;
         if (this.contains(o)) {
             for(int i = 0; i < this.size; ++i) {
                 if (o.equals(this.array[i])) {
-                    index = i;
-                    break;
+                    return i;
                 }
             }
         }
-
-        return index;
+        return -1;
     }
 
     @Override
@@ -267,9 +268,11 @@ public class StudentList implements List<Student> {
 
     @Override
     public List<Student> subList(int i, int i1) {
-        if(i<0 || i>size || i1<0 || i1>size)throw new IndexOutOfBoundsException();
-        else if(i>i1)throw new IllegalArgumentException();
-        ArrayList<Student> students = new ArrayList<>();
+        if(i<0 || i>size || i1<0 || i1>size)
+            throw new IllegalArgumentException(" Illegal arguments, at least one index is out of bounds");
+        else if(i>i1)
+            throw new IllegalArgumentException("Invalid arguments, i1 must ne greater than i");
+        StudentList students = new StudentList();
         for(int j=i;j<i1;j++){
             students.add(array[j]);
         }
@@ -278,8 +281,8 @@ public class StudentList implements List<Student> {
 
     @Override
     public boolean addAll(Collection<? extends Student> c) {
-        if (c == null) {
-            throw new NullPointerException();
+        if (!Objects.nonNull(c)) {
+            throw new IllegalArgumentException("Argument, passed to the method is null");
         } else {
             Student[] obs = (Student[]) c.toArray();
             if (c.size() + this.size() < this.capacity) {
@@ -317,8 +320,8 @@ public class StudentList implements List<Student> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        if (c == null) {
-            throw new NullPointerException();
+        if (!Objects.nonNull(c)) {
+            throw new IllegalArgumentException("Argument, passed to the method is null");
         } else {
             if (c.size() < this.size()) {
                 Iterator var2 = c.iterator();
@@ -338,8 +341,8 @@ public class StudentList implements List<Student> {
     @Override
     public boolean addAll(int index, Collection<? extends Student> c) {
         if (index >= 0 && index <= this.size) {
-            if (c == null) {
-                throw new NullPointerException();
+            if (!Objects.nonNull(c)) {
+                throw new IllegalArgumentException("Argument, passed to the method is null");
             } else {
                 Student[] objects = (Student[]) c.toArray();
                 Student[] arr;
@@ -360,18 +363,19 @@ public class StudentList implements List<Student> {
                 return true;
             }
         } else {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("Index is out of bounds");
         }
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        if (c == null) {
-            throw new NullPointerException();
+        if (!Objects.nonNull(c)) {
+            throw new IllegalArgumentException("Argument, passed to the method is null");
         } else {
             Object[] objects = c.toArray();
             for(Object ob:objects){
-                if(ob==null)throw new NullPointerException();
+                if(!Objects.nonNull(ob))
+                    throw new IllegalArgumentException("Your collection contains a null reference");
                 remove(ob);
             }
             return true;
