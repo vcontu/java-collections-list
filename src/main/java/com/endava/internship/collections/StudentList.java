@@ -42,15 +42,11 @@ public class StudentList implements List<Student> {
         if (Objects.isNull(collection)) {
             throw new IllegalArgumentException("Collection does not exists");
         } else {
+            Student[] students = collection.toArray(new Student[0]);
             this.size = collection.size();
             this.capacity = this.size * 2;
             this.array = new Student[this.capacity];
-            final Iterator iterator = collection.iterator();
-
-            while (iterator.hasNext()) {
-                this.add((Student) iterator.next());
-            }
-
+            System.arraycopy(students,0,array,0,size);
         }
     }
 
