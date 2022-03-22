@@ -48,8 +48,7 @@ public class StudentList implements List<Student> {
             final Iterator iterator = collection.iterator();
 
             while (iterator.hasNext()) {
-                Student t = (Student) iterator.next();
-                this.add(t);
+                this.add((Student) iterator.next());
             }
 
         }
