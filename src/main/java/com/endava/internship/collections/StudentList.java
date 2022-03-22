@@ -27,22 +27,17 @@ public class StudentList implements List<Student> {
         if (initialCapacity >= 0) {
             this.capacity = initialCapacity;
             this.array = new Student[this.capacity];
-        } else {
-            if (initialCapacity < 0) {
-                throw new IllegalArgumentException("Initial capacity must be greater than 0 : initialCapacity = " + initialCapacity);
-            }
-
-            this.capacity = 10;
-            this.array = new Student[this.capacity];
         }
-
+        else {
+            throw new IllegalArgumentException("Initial capacity must be greater than 0 : initialCapacity = " + initialCapacity);
+            }
     }
 
     public StudentList(Collection<? extends Student> collection) {
         if (Objects.isNull(collection)) {
             throw new IllegalArgumentException("Collection does not exists");
         } else {
-            Student[] students = collection.toArray(new Student[0]);
+            final Student[] students = collection.toArray(new Student[0]);
             this.size = collection.size();
             this.capacity = this.size * 2;
             this.array = new Student[this.capacity];
@@ -98,7 +93,7 @@ public class StudentList implements List<Student> {
             }
 
             ++this.size;
-            Student[] students = new Student[this.capacity];
+            final Student[] students = new Student[this.capacity];
 
             for (int i = 0; i < this.size - 1; ++i) {
                 students[i] = this.array[i];
@@ -211,65 +206,6 @@ public class StudentList implements List<Student> {
     @Override
     public ListIterator<Student> listIterator() {
         return new MyListaiterator<>();
-    }
-
-    private class MyListaiterator<Student> implements ListIterator<com.endava.internship.collections.Student> {
-        int cursor;
-        int lastReturnedElem = -1;
-
-        MyListaiterator() {
-            cursor = 0;
-        }
-
-        MyListaiterator(int index) {
-            cursor = index;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return cursor < size;
-        }
-
-        @Override
-        public com.endava.internship.collections.Student next() {
-            return array[cursor++];
-        }
-
-        @Override
-        public boolean hasPrevious() {
-            return cursor > 0;
-        }
-
-        @Override
-        public com.endava.internship.collections.Student previous() {
-            lastReturnedElem = --cursor;
-            return array[cursor];
-        }
-
-        @Override
-        public int nextIndex() {
-            return cursor + 1;
-        }
-
-        @Override
-        public int previousIndex() {
-            return cursor + 1;
-        }
-
-        @Override
-        public void remove() {
-            StudentList.this.remove(cursor);
-        }
-
-        @Override
-        public void set(com.endava.internship.collections.Student student) {
-            StudentList.this.set(cursor, student);
-        }
-
-        @Override
-        public void add(com.endava.internship.collections.Student student) {
-            StudentList.this.add(student);
-        }
     }
 
     @Override
@@ -387,7 +323,7 @@ public class StudentList implements List<Student> {
         } else {
             final Object[] objects = collection.toArray();
             for (Object object : objects) {
-                if (!Objects.nonNull(object)) {
+                if (Objects.isNull(object)) {
                     throw new IllegalArgumentException("Your collection contains a null reference");
                 }
                 remove(object);
@@ -400,5 +336,63 @@ public class StudentList implements List<Student> {
     public boolean retainAll(Collection<?> collection) {
         //Ignore this for homework
         throw new UnsupportedOperationException();
+    }
+    private class MyListaiterator<Student> implements ListIterator<com.endava.internship.collections.Student> {
+        int cursor;
+        int lastReturnedElem = -1;
+
+        MyListaiterator() {
+            cursor = 0;
+        }
+
+        MyListaiterator(int index) {
+            cursor = index;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cursor < size;
+        }
+
+        @Override
+        public com.endava.internship.collections.Student next() {
+            return array[cursor++];
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return cursor > 0;
+        }
+
+        @Override
+        public com.endava.internship.collections.Student previous() {
+            lastReturnedElem = --cursor;
+            return array[cursor];
+        }
+
+        @Override
+        public int nextIndex() {
+            return cursor + 1;
+        }
+
+        @Override
+        public int previousIndex() {
+            return cursor + 1;
+        }
+
+        @Override
+        public void remove() {
+            StudentList.this.remove(cursor);
+        }
+
+        @Override
+        public void set(com.endava.internship.collections.Student student) {
+            StudentList.this.set(cursor, student);
+        }
+
+        @Override
+        public void add(com.endava.internship.collections.Student student) {
+            StudentList.this.add(student);
+        }
     }
 }
