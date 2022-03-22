@@ -139,7 +139,7 @@ public class StudentList implements List<Student> {
 
     @Override
     public Student get(int index) {
-        if (index > this.size && index < 0) {
+        if (index > this.size || index < 0) {
             throw new IndexOutOfBoundsException(" Index is out of bounds");
         } else {
             return this.array[index];
