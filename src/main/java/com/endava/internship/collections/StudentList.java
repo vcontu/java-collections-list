@@ -9,12 +9,13 @@ public class StudentList<T> implements List<T> {
 
     private int size;
 
-    private int capacity = 10;
+    private int capacity;
 
     private Object[] elements;
 
     public StudentList() {
         this.elements = new Object[DEFAULT_CAPACITY];
+        this.capacity = 10;
     }
 
     public StudentList(int capacity) {
@@ -52,14 +53,14 @@ public class StudentList<T> implements List<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return new StudentList.Iter();
+        return new Iter();
     }
     private class Iter implements Iterator<T> {
-        int cursor;       // index of next element to return
-        int lastElem = -1; // index of last element returned; -1 if no such
+        int cursor;
+        int lastElem = -1;
 
 
-        // prevent creating a synthetic constructor
+
         Iter() {}
 
         public boolean hasNext() {
@@ -163,8 +164,9 @@ public class StudentList<T> implements List<T> {
 
     @Override
     public void clear() {
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             elements[i] = null;
+        }
         size = 0;
     }
 
@@ -215,7 +217,7 @@ public class StudentList<T> implements List<T> {
     public int indexOf(Object t) {
         if (Objects.isNull(t)) {
             for (int i = 0; i < size; i++) {
-                if (null == elements[i]) {
+                if (elements[i] == null) {
                     return i;
                 }
             }
@@ -230,7 +232,13 @@ public class StudentList<T> implements List<T> {
 
     @Override
     public int lastIndexOf(Object t) {
-        if (Objects.nonNull(t)) { // ???
+        if (Objects.isNull(t)) {
+            for (int i = size - 1; i >= 0; i--) {
+                if (elements[i] == null) {
+                    return i;
+                }
+            }
+        }else{
             for (int i = size - 1; i >= 0; i--) {
                 if (t.equals(elements[i])) {
                     return i;
@@ -315,7 +323,7 @@ public class StudentList<T> implements List<T> {
     public List<T> subList(int i, int i1) {
         List<T> subList = new StudentList<>();
         for (int j = i; j < i1; j++) {
-            subList.add((T) elements[j]);
+            subList.add(this.get(j));
         }
         return subList;
     }
@@ -353,8 +361,8 @@ public class StudentList<T> implements List<T> {
     }
 
     // Utility methods
-    private void resizeArray() {
-        this.capacity = elements.length * 2;
+    public void resizeArray() {
+        this.capacity *= 2;
         elements = Arrays.copyOf(elements, capacity);
     }
 

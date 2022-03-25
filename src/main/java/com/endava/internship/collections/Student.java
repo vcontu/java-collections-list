@@ -6,13 +6,16 @@ import java.util.Objects;
 /**
  * The class that defines the element that will be contained by your collection
  */
-public class Student //TODO consider implementing any interfaces necessary for your collection
+public class Student implements Comparable<Student> //TODO consider implementing any interfaces necessary for your collection
 {
     private final String name;
     private final LocalDate dateOfBirth;
     private final String details;
 
     public Student(String name, LocalDate dateOfBirth, String details) {
+        if(Objects.isNull(name) || Objects.isNull(dateOfBirth)) {
+            throw new NullPointerException();
+        }
         this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.details = details;
@@ -26,8 +29,12 @@ public class Student //TODO consider implementing any interfaces necessary for y
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Student student = (Student) o;
         return name.equals(student.name) && dateOfBirth.equals(student.dateOfBirth);
     }
@@ -44,6 +51,15 @@ public class Student //TODO consider implementing any interfaces necessary for y
                 ", dateOfBirth=" + dateOfBirth +
                 ", details='" + details + '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Student st) {
+        if(Objects.isNull(st)){
+            throw new NullPointerException();
+        }
+        int compareName = this.getName().compareTo(st.getName());
+        return compareName == 0 ?  this.getDateOfBirth().compareTo(st.getDateOfBirth()): compareName;
     }
 
     /*

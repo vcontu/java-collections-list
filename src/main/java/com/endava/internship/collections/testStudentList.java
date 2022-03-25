@@ -1,6 +1,7 @@
 package com.endava.internship.collections;
 
 
+
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,11 +15,11 @@ public class testStudentList {
         List<Student> arrayList = new ArrayList<>();
         Object[] arrList = new Object[10];
 
-        Student st1 = new Student("Unu", LocalDate.of(2000, 01, 01), "Student ONE");
-        Student st2 = new Student("Doi", LocalDate.of(2000, 01, 01), "Student TWO");
-        Student st3 = new Student("Trei", LocalDate.of(2000, 01, 01), "Student TREE");
-        Student st4 = new Student("Patru", LocalDate.of(2000, 01, 01), "Student FOUR");
-        Student st10 = new Student("ZECE", LocalDate.of(2000, 01, 01), "Student TEN");
+        Student st1 = new Student("CINCI", LocalDate.of(2001, 01, 01), "Student ONE");
+        Student st2 = new Student("Doi", LocalDate.of(2004, 01, 01), "Student TWO");
+        Student st3 = new Student("Trei", LocalDate.of(2006, 01, 01), "Student TREE");
+        Student st4 = new Student("Patru", LocalDate.of(2008, 01, 01), "Student FOUR");
+        Student st10 = new Student("ZECE", LocalDate.of(2010, 01, 01), "Student TEN");
         Student st110 = new Student("110", LocalDate.of(2000, 01, 01), "Student 110");
         Student st5 = new Student("CINCI", LocalDate.of(2000, 01, 01), "Student FIVE");
 
@@ -27,6 +28,7 @@ public class testStudentList {
         list.add(st2);
         list.add(st3);
         list.add(st4);
+//        list.add(null);
         list.add(st5);
 //        list.add(null);
 
@@ -74,10 +76,12 @@ public class testStudentList {
 //
 //        System.out.println("=========================================");
 //        System.out.println("The object is in the location with the index " + list.indexOf(st10));//
+//        System.out.println("The object is in the location with the index " + list.indexOf(null));//
 //
-//
+
 //        System.out.println("=========================================");
-//        System.out.println("The object is in the location with the index " + list.lastIndexOf(st10));
+//        System.out.println("The object is in the location with the index " + list.lastIndexOf(null));
+//        System.out.println("The object is in the location with the index " + list.lastIndexOf(st4));
 
 
 //        System.out.println(list.get(4));
@@ -92,7 +96,7 @@ public class testStudentList {
 //        System.out.println(newSubList.get(0));
 //        System.out.println(newSubList.get(1));
 //        System.out.println(newSubList.get(2));
-
+//
 //        System.out.println();
 //        System.out.println("The size of our list is: " + list.size());
 //        System.out.println(list.get(4));
@@ -300,7 +304,36 @@ public class testStudentList {
 //            System.out.print(element + " \n");
 //        }
 //        System.out.println("================================================================================");
+//
+//
+//        COMPARE TO
+//        System.out.println("================================================================================");
+//        for (int i = 0; i < list.size(); i++) {
+//            System.out.println(list.get(i));
+//        }
+//
+//        System.out.println("================================================================================");
+//        System.out.println("================================================================================");
+//        System.out.println("================================================================================");
+//
+//        Comparator<Student> comparator = (st11, st22) -> st11.compareTo(st22);
+//
+//        list.sort(comparator);
+//
+//        for (int i = 0; i < list.size(); i++) {
+//            System.out.println(list.get(i));
+//        }
+//
+//        System.out.println("================================================================================");
+        list.resizeArray();
 
 //                                      DONE !!!!!
     }
 }
+
+
+//for (int i = 0; i < size; i++) {
+//        if (Objects.isNull(elements[i]) || (t != null || t.equals(elements[i]))) {
+//        return true;
+//        }
+//        }
