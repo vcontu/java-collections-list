@@ -1,7 +1,12 @@
 package com.endava.internship.collections;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class StudentList<T> implements List<T> {
 
@@ -15,12 +20,19 @@ public class StudentList<T> implements List<T> {
 
     public StudentList() {
         this.elements = new Object[DEFAULT_CAPACITY];
-        this.capacity = 10;
+        this.capacity = DEFAULT_CAPACITY;
     }
 
     public StudentList(int capacity) {
-        this.capacity = capacity;
-        this.elements = new Object[capacity];
+        if (capacity > 0) {
+            this.elements = new Object[capacity];
+            this.capacity = capacity;
+        } else if (capacity == 0) {
+            this.elements = new Object[]{};
+        } else {
+            throw new IllegalArgumentException("Illegal Capacity: "+
+                    capacity);
+        }
     }
 
     @Override
@@ -35,17 +47,9 @@ public class StudentList<T> implements List<T> {
 
     @Override
     public boolean contains(Object t) {
-        if (Objects.isNull(t)) {
-            for (int i = 0; i < size; i++) {
-                if (null == elements[i]) {
-                    return true;
-                }
-            }
-        }else{
-            for (int i = 0; i < size; i++) {
-                if (t.equals(elements[i])) {
-                    return true;
-                }
+        for (int i = 0; i < size; i++) {
+            if (Objects.equals(t, elements[i])) {
+                return true;
             }
         }
         return false;
@@ -55,66 +59,29 @@ public class StudentList<T> implements List<T> {
     public Iterator<T> iterator() {
         return new Iter();
     }
+
     private class Iter implements Iterator<T> {
-        int cursor;
-        int lastElem = -1;
+        int currentElement;
 
-
-
-        Iter() {}
-
-        public boolean hasNext() {
-            return cursor != size;
-        }
-
-        public T next() {
-            int i = cursor;
-            if (i >= size) {
-                throw new NoSuchElementException();
-            }
-            Object[] elements = StudentList.this.elements;
-
-            if (i >= elements.length)
-                throw new ConcurrentModificationException();
-            cursor = i + 1;
-            return (T) elements[lastElem = i];
-        }
-
-        public void remove() {
-            if (lastElem < 0) {
-                throw new IllegalStateException();
-            }
-            try {
-                StudentList.this.remove(lastElem);
-                cursor = lastElem;
-                lastElem = -1;
-            } catch (IndexOutOfBoundsException ex) {
-                throw new ConcurrentModificationException();
-            }
+        Iter() {
         }
 
         @Override
-        public void forEachRemaining(Consumer<? super T> action) {
-            Objects.requireNonNull(action);
-            final int size = StudentList.this.size;
-            int i = cursor;
-
-            if (i < size) {
-                final Object[] es = elements;
-                if (i >= es.length) {
-                    throw new ConcurrentModificationException();
-                }
-
-                for (; i < size ; i++) {
-                    action.accept(elementAt(es, i));
-                }
-
-                cursor = i;
-                lastElem = i - 1;
-            }
+        public boolean hasNext() {
+            return currentElement < size;
         }
-        private <T> T elementAt(Object[] es, int index) {
-            return (T) es[index];
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return StudentList.this.get(currentElement++);
+        }
+
+        @Override
+        public void remove() {
+            StudentList.this.remove(elements[--currentElement]);
         }
     }
 
@@ -123,23 +90,24 @@ public class StudentList<T> implements List<T> {
         return Arrays.copyOf(elements, size);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> T[] toArray(T[] ts) {
-        if(Objects.isNull(ts)){
+    public <E> E[] toArray(E[] ts) {
+        if (Objects.isNull(ts)) {
             throw new NullPointerException();
         }
-        if(ts.length >= this.size()){
-            for (int i = 0; i < this.size; i++) {
-                ts[i] = (T) this.get(i);
+        if (ts.length >= this.size()) {
+            int i = 0;
+            for (; i < this.size; i++) {
+                ts[i] = (E) this.get(i);
+            }
+            for (; i < ts.length; i++) {
+                ts[i] = null;
             }
             return ts;
-        }else{
-            Object[] newResizedArray = new Object[ts.length];
-            for (int i = 0; i < ts.length; i++) {
-                newResizedArray[i] = (T) this.get(i);
-            }
-        return (T[]) newResizedArray;
         }
+
+        return (E[]) Arrays.copyOf(elements, size, ts.getClass());
     }
 
     @Override
@@ -153,13 +121,15 @@ public class StudentList<T> implements List<T> {
 
     @Override
     public boolean remove(Object t) {
-        if (!this.contains(t)) {
-            return false;
+        if(!contains(t)){
+          return false;
         }
-        Object[] elements = decreasedArray(size);
-        int indexOfDeletedObject = this.indexOf(t);
-        copyArray(indexOfDeletedObject, elements);
-        return true;
+        int index = this.indexOf(t);
+        if (index >= 0) {
+            remove(index);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -170,60 +140,57 @@ public class StudentList<T> implements List<T> {
         size = 0;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public T get(int i) {
-        if (i >= 0 && i <= size) {
+        if (i >= 0 && i < size) {
             return (T) elements[i];
         } else {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("Insertion index was out of range. Must be non-negative and less than or equal to size");
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public T set(int i, T t) {
         if (i >= 0 && i < size) {
             return (T) (elements[i] = t);
         } else {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("Insertion index was out of range. Must be non-negative and less than or equal to size");
         }
     }
 
     @Override
     public void add(int i, T t) {
-        if (i < 0 && i > size) {
-            throw new IndexOutOfBoundsException();
+        if (i < 0 || i > size) {
+            throw new IndexOutOfBoundsException("Insertion index was out of range. Must be non-negative and less than or equal to size");
         }
         if (size == elements.length) {
             resizeArray();
         }
-        for (int start = size; start > i; start--) {
-            elements[start] = elements[start - 1];
+        if (size - i >= 0) {
+            System.arraycopy(elements, i, elements, i + 1, size - i);
         }
         elements[i] = t;
+        size++;
     }
 
     @Override
     public T remove(int i) {
         if (i < 0 || i >= size) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("Insertion index was out of range. Must be non-negative and less than or equal to size");
         }
-        final Object elementToDelete = elements[i];
-        Object[] elements = decreasedArray(size);
-        copyArray(i, elements);
-        return (T) elementToDelete;
+        T elementToRemove = this.get(i);
+        System.arraycopy(elements, i + 1, elements, i, size() - i);
+        elements[size] = null;
+        size--;
+        return elementToRemove;
     }
 
     @Override
     public int indexOf(Object t) {
-        if (Objects.isNull(t)) {
-            for (int i = 0; i < size; i++) {
-                if (elements[i] == null) {
-                    return i;
-                }
-            }
-        }
         for (int i = 0; i < size; i++) {
-            if (t.equals(elements[i])) {
+            if (Objects.equals(t, elements[i])) {
                 return i;
             }
         }
@@ -232,17 +199,9 @@ public class StudentList<T> implements List<T> {
 
     @Override
     public int lastIndexOf(Object t) {
-        if (Objects.isNull(t)) {
-            for (int i = size - 1; i >= 0; i--) {
-                if (elements[i] == null) {
-                    return i;
-                }
-            }
-        }else{
-            for (int i = size - 1; i >= 0; i--) {
-                if (t.equals(elements[i])) {
-                    return i;
-                }
+        for (int i = 0; i < size; i++) {
+            if (Objects.equals(t, elements[i])) {
+                return i;
             }
         }
         return -1;
@@ -261,61 +220,52 @@ public class StudentList<T> implements List<T> {
     private class ListIter extends Iter implements ListIterator<T> {
         ListIter(int index) {
             super();
-            cursor = index;
+            currentElement = index;
         }
 
         @Override
         public boolean hasPrevious() {
-            return cursor != 0;
+            return currentElement > 0;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public T previous() {
-            int i = cursor - 1;
-            if (i < 0){
+            --currentElement;
+            if (currentElement < 0) {
                 throw new NoSuchElementException();
             }
-            Object[] elements = StudentList.this.elements;
-            if (i >= elements.length) {
-                throw new ConcurrentModificationException();
-            }
-            cursor = i;
-            return (T) elements[lastElem = i];
+            return (T) elements[currentElement];
         }
 
         @Override
         public int nextIndex() {
-            return cursor;
+            return currentElement;
         }
 
         @Override
         public int previousIndex() {
-            return cursor - 1;
+            if(hasPrevious()){
+                return currentElement - 1;
+            }else{
+                throw new IndexOutOfBoundsException();
+            }
         }
 
         @Override
         public void set(T t) {
-            if (lastElem < 0) {
-                throw new IllegalStateException();
+            currentElement--;
+            if (currentElement < 0) {
+                throw new NoSuchElementException();
             }
-            try {
-                StudentList.this.set(lastElem, t);
-            } catch (IndexOutOfBoundsException ex) {
-                throw new ConcurrentModificationException();
-            }
+                StudentList.this.set(currentElement, t);
         }
 
         @Override
         public void add(T t) {
-
-            try {
-                int i = cursor;
+                int i = currentElement;
                 StudentList.this.add(i, t);
-                cursor = i + 1;
-                lastElem = -1;
-            } catch (IndexOutOfBoundsException ex) {
-                throw new ConcurrentModificationException();
-            }
+                currentElement = i + 1;
         }
     }
 
@@ -360,8 +310,7 @@ public class StudentList<T> implements List<T> {
         throw new UnsupportedOperationException();
     }
 
-    // Utility methods
-    public void resizeArray() {
+    private void resizeArray() {
         this.capacity *= 2;
         elements = Arrays.copyOf(elements, capacity);
     }
@@ -378,23 +327,6 @@ public class StudentList<T> implements List<T> {
             currentCapacity *= 2;
         }
         return currentCapacity;
-    }
-
-    private T[] decreasedArray(int size){
-        Object[] tempArr = new Object[size - 1];
-        return (T[])tempArr;
-    }
-
-    private void copyArray(int i, Object[] tempArr) {
-        for (int j = 0; j < size - 1; j++) {
-            if(j >= i){
-                tempArr[j] = elements[j + 1];
-            }else{
-                tempArr[j] = elements[j];
-            }
-        }
-        size--;
-        elements = tempArr;
     }
 }
 

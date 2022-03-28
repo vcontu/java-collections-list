@@ -59,7 +59,7 @@ public class Student implements Comparable<Student> //TODO consider implementing
             throw new NullPointerException();
         }
         int compareName = this.getName().compareTo(st.getName());
-        return compareName == 0 ?  this.getDateOfBirth().compareTo(st.getDateOfBirth()): compareName;
+        return compareName == 0 ?  this.getDateOfBirth().compareTo(st.getDateOfBirth()) : compareName;
     }
 
     /*
