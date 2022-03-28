@@ -24,13 +24,14 @@ public class StudentList<T> implements List<T> {
     }
 
     public StudentList(int capacity) {
-        if (capacity > 0) {
+        if (capacity <= DEFAULT_CAPACITY && capacity >= 0) {
+            this.elements = new Object[DEFAULT_CAPACITY];
+            this.capacity = DEFAULT_CAPACITY;
+        } else if (capacity > DEFAULT_CAPACITY) {
             this.elements = new Object[capacity];
             this.capacity = capacity;
-        } else if (capacity == 0) {
-            this.elements = new Object[]{};
         } else {
-            throw new IllegalArgumentException("Illegal Capacity: "+
+            throw new IllegalArgumentException("Illegal Capacity: " +
                     capacity);
         }
     }
@@ -81,7 +82,10 @@ public class StudentList<T> implements List<T> {
 
         @Override
         public void remove() {
-            StudentList.this.remove(elements[--currentElement]);
+            if (currentElement > 0) {
+                StudentList.this.remove(--currentElement);
+            }
+            throw new NoSuchElementException();
         }
     }
 
@@ -112,7 +116,7 @@ public class StudentList<T> implements List<T> {
 
     @Override
     public boolean add(T t) {
-        if (size == elements.length) {
+        if (size == this.capacity) {
             resizeArray();
         }
         elements[size++] = t;
@@ -121,9 +125,6 @@ public class StudentList<T> implements List<T> {
 
     @Override
     public boolean remove(Object t) {
-        if(!contains(t)){
-          return false;
-        }
         int index = this.indexOf(t);
         if (index >= 0) {
             remove(index);
@@ -146,7 +147,7 @@ public class StudentList<T> implements List<T> {
         if (i >= 0 && i < size) {
             return (T) elements[i];
         } else {
-            throw new IndexOutOfBoundsException("Insertion index was out of range. Must be non-negative and less than or equal to size");
+            throw new IndexOutOfBoundsException("Index should be greater then or equal to 0 and less then " + size());
         }
     }
 
@@ -156,7 +157,7 @@ public class StudentList<T> implements List<T> {
         if (i >= 0 && i < size) {
             return (T) (elements[i] = t);
         } else {
-            throw new IndexOutOfBoundsException("Insertion index was out of range. Must be non-negative and less than or equal to size");
+            throw new IndexOutOfBoundsException("Insertion index was out of range. Must be non-negative and less than size");
         }
     }
 
@@ -165,10 +166,10 @@ public class StudentList<T> implements List<T> {
         if (i < 0 || i > size) {
             throw new IndexOutOfBoundsException("Insertion index was out of range. Must be non-negative and less than or equal to size");
         }
-        if (size == elements.length) {
+        if (size == capacity) {
             resizeArray();
         }
-        if (size - i >= 0) {
+        if (size - i > 0) {
             System.arraycopy(elements, i, elements, i + 1, size - i);
         }
         elements[i] = t;
@@ -178,7 +179,7 @@ public class StudentList<T> implements List<T> {
     @Override
     public T remove(int i) {
         if (i < 0 || i >= size) {
-            throw new IndexOutOfBoundsException("Insertion index was out of range. Must be non-negative and less than or equal to size");
+            throw new IndexOutOfBoundsException("Insertion index was out of range. Must be non-negative and less than size");
         }
         T elementToRemove = this.get(i);
         System.arraycopy(elements, i + 1, elements, i, size() - i);
@@ -199,7 +200,7 @@ public class StudentList<T> implements List<T> {
 
     @Override
     public int lastIndexOf(Object t) {
-        for (int i = 0; i < size; i++) {
+        for (int i = size - 1; i >= 0; i--) {
             if (Objects.equals(t, elements[i])) {
                 return i;
             }
@@ -231,11 +232,10 @@ public class StudentList<T> implements List<T> {
         @SuppressWarnings("unchecked")
         @Override
         public T previous() {
-            --currentElement;
-            if (currentElement < 0) {
-                throw new NoSuchElementException();
+            if (hasPrevious()) {
+                return StudentList.this.get(--currentElement);
             }
-            return (T) elements[currentElement];
+            throw new NoSuchElementException();
         }
 
         @Override
@@ -245,27 +245,26 @@ public class StudentList<T> implements List<T> {
 
         @Override
         public int previousIndex() {
-            if(hasPrevious()){
+            if (hasPrevious()) {
                 return currentElement - 1;
-            }else{
+            } else {
                 throw new IndexOutOfBoundsException();
             }
         }
 
         @Override
         public void set(T t) {
-            currentElement--;
-            if (currentElement < 0) {
-                throw new NoSuchElementException();
+            if (hasPrevious()) {
+                StudentList.this.set(--currentElement, t);
             }
-                StudentList.this.set(currentElement, t);
+                throw new NoSuchElementException();
         }
 
         @Override
         public void add(T t) {
-                int i = currentElement;
-                StudentList.this.add(i, t);
-                currentElement = i + 1;
+            int i = currentElement;
+            StudentList.this.add(i, t);
+            currentElement = i + 1;
         }
     }
 

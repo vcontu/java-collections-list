@@ -13,9 +13,14 @@ public class Student implements Comparable<Student> //TODO consider implementing
     private final String details;
 
     public Student(String name, LocalDate dateOfBirth, String details) {
-        if(Objects.isNull(name) || Objects.isNull(dateOfBirth)) {
-            throw new NullPointerException();
+        if(Objects.isNull(name)) {
+            throw new NullPointerException("The name can not be null");
         }
+
+        if(Objects.isNull(dateOfBirth)) {
+            throw new NullPointerException("Date of birth can not be null");
+        }
+
         this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.details = details;
