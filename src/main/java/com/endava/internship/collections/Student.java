@@ -1,6 +1,7 @@
 package com.endava.internship.collections;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * The class that defines the element that will be contained by your collection
@@ -21,8 +22,26 @@ public class Student //TODO consider implementing any interfaces necessary for y
 
     public LocalDate getDateOfBirth() { return dateOfBirth; }
 
+    @Override
+    public String toString() {
+        return " "+name+" "+dateOfBirth.toString() + " "+details;
+    }
+
     public String getDetails() { return details; }
-/*
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Student student = (Student) object;
+        return Objects.equals(name, student.name) && Objects.equals(dateOfBirth, student.dateOfBirth) && Objects.equals(details, student.details);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, dateOfBirth, details);
+    }
+    /*
     TODO consider overriding any methods for this object to function properly within a collection:
         1. A student is considered unique by a combination of their name and dateOfBirth
         2. Student names are sorted alphabetically, if two students have the same name, then the older one is

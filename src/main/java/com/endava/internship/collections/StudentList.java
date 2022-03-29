@@ -57,9 +57,18 @@ public class StudentList implements List<Student> {
 
     @Override
     public boolean contains(Object object) {
-        for (int i = 0; i < this.size; i++) {
-            if (array[i].equals(object)) {
-                return true;
+        if(Objects.isNull(object)){
+            for (int i = 0; i < this.size; i++) {
+                if (array[i]==object) {
+                    return true;
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < this.size; i++) {
+                if (object.equals(array[i])) {
+                    return true;
+                }
             }
         }
         return false;
@@ -128,14 +137,13 @@ public class StudentList implements List<Student> {
         for (int i = 0; i < this.size; ++i) {
             this.array[i] = null;
         }
-
         this.size = 0;
     }
 
     @Override
     public Student get(int index) {
-        if (index > this.size || index < 0) {
-            throw new IndexOutOfBoundsException(" Index is out of bounds");
+        if (index >= this.size || index < 0) {
+            throw new IndexOutOfBoundsException("Index is out of bounds");
         } else {
             return this.array[index];
         }
@@ -154,7 +162,7 @@ public class StudentList implements List<Student> {
 
     @Override
     public void add(int index, Student student) {
-        if (index >= 0 && index < size) {
+        if (index >= 0 && index <= size) {
             for (int i = this.size; i > index; --i) {
                 this.array[i] = this.array[i - 1];
             }
@@ -184,6 +192,13 @@ public class StudentList implements List<Student> {
 
     @Override
     public int indexOf(Object object) {
+        if (Objects.isNull(object)) {
+            for (int i = 0; i < this.size; ++i) {
+                if (Objects.isNull(array[i])) {
+                    return i;
+                }
+            }
+        }
         for (int i = 0; i < this.size; ++i) {
             if (array[i].equals(object)) {
                 return i;
@@ -219,7 +234,7 @@ public class StudentList implements List<Student> {
     @Override
     public List<Student> subList(int index, int index1) {
         if (index < 0 || index > size || index1 < 0 || index1 > size)
-            throw new IllegalArgumentException(" Illegal arguments, at least one index is out of bounds");
+            throw new IllegalArgumentException("Illegal arguments, at least one index is out of bounds");
         else if (index > index1)
             throw new IllegalArgumentException("Invalid arguments, i1 must ne greater than i");
         final StudentList students = new StudentList();
@@ -273,15 +288,15 @@ public class StudentList implements List<Student> {
         if (Objects.isNull(collection)) {
             throw new IllegalArgumentException("Argument, passed to the method is null");
         } else {
-            if (collection.size() < this.size()) {
-                final Iterator var2 = collection.iterator();
-                if (var2.hasNext()) {
-                    Object ob = var2.next();
+            if (collection.size() <= this.size()) {
+                final Iterator iterator = collection.iterator();
+                if (iterator.hasNext()) {
+                    Object ob = iterator.next();
                     if (!this.contains(ob)) {
                         return false;
                     }
-                    return true;
                 }
+                return true;
             }
             return false;
         }
