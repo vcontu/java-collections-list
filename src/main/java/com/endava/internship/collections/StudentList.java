@@ -269,7 +269,7 @@ public class StudentList implements List<Student> {
 
                 this.array = arr;
             }
-
+            size=size+collection.size();
             return true;
         }
     }
@@ -287,7 +287,8 @@ public class StudentList implements List<Student> {
     public boolean containsAll(Collection<?> collection) {
         if (Objects.isNull(collection)) {
             throw new IllegalArgumentException("Argument, passed to the method is null");
-        } else {
+        }
+        else {
             if (collection.size() <= this.size()) {
                 final Iterator iterator = collection.iterator();
                 if (iterator.hasNext()) {
@@ -304,7 +305,7 @@ public class StudentList implements List<Student> {
 
     @Override
     public boolean addAll(int index, Collection<? extends Student> collection) {
-        if (index >= 0 && index <= this.size) {
+        if (index >= 0 && index < this.size) {
             if (Objects.isNull(collection)) {
                 throw new IllegalArgumentException("Argument, passed to the method is null");
             } else {
@@ -313,8 +314,8 @@ public class StudentList implements List<Student> {
                 if (this.size() + collection.size() < this.capacity) {
                     students = new Student[this.size() - index];
                     System.arraycopy(this.array, index, students, 0, this.size() - index);
-                    System.arraycopy(objects, 0, this.array, index, collection.size() + index);
-                    System.arraycopy(students, 0, this.array, collection.size() + index, this.size() + collection.size());
+                    System.arraycopy(objects, 0, this.array, index, collection.size() + index-1);
+                    System.arraycopy(students, 0, this.array, collection.size() + index-1, students.length);
                 } else {
                     this.capacity *= 2;
                     students = new Student[this.capacity];

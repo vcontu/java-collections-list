@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.in;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StudentListTest {
@@ -209,9 +210,33 @@ class StudentListTest {
         //then
         assertEquals(null,returnedStudent);
     }
-    @Test
-    void set() {
+    @ParameterizedTest
+    @ValueSource(ints = {-10,1,2,7,89,100})
+    void setThrowsExceptionInvalidIndex(int index) {
+        //given
+        Student petea =new Student(names[3],birthdays[2],details[3] );
+        Student valik = new Student(names[0],birthdays[0],details[0]);
+        //when
+        students.add(petea);
+        IndexOutOfBoundsException exception =
+                assertThrows(IndexOutOfBoundsException.class,
+                        ()->students.set(index,valik),"Exception should be thrown");
+        //then
+        assertEquals("Index is greater than size of ArrayList or smaller than 0: index = " + index,
+                exception.getMessage(),"With message");
+    }
 
+    @Test
+    void setSucceeds() {
+        //given
+        Student petea =new Student(names[3],birthdays[2],details[3] );
+        Student valik = new Student(names[0],birthdays[0],details[0]);
+
+        //when
+        students.add(valik);
+        Student student = students.set(0,petea);
+        //then
+        assertEquals(student,valik,"Because I set Petea in place of Valik,in result I got previous element,should succeed");
     }
 
     @Test
@@ -336,13 +361,6 @@ class StudentListTest {
         //then
         assertTrue(lastIndexOfValik==-1,"Because of Valik is not in list,output is -1");
     }
-    @Test
-    void listIterator() {
-    }
-
-    @Test
-    void testListIterator() {
-    }
 
     @Test
     void subList() {
@@ -399,26 +417,188 @@ class StudentListTest {
     }
 
     @Test
-    void addAll() {
+    void addAllThrowsException() {
+        //given
+        StudentList studentList = null;
+        //when
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class,()->students.addAll(studentList),
+                        "Exception should be thrown");
+        //then
+        assertEquals(exception.getMessage(),"Argument, passed to the method is null",
+                "First index should be greater than last");
+    }
+    @Test
+    void addAllWorksNice() {
+        //given
+        Student valik = new Student(names[1],birthdays[2],details[3]);
+        Student vova = new Student(names[1],birthdays[1],details[1]);
+        Student petea = new Student(names[0],birthdays[0],details[0]);
+        StudentList studentList = new StudentList();
+        studentList.add(valik);
+        studentList.add(vova);
+        studentList.add(null);
+        studentList.add(petea);
+        studentList.add(null);
+        //when
+        boolean result= students.addAll(studentList);
+        //then
+        assertAll(
+                ()->assertTrue(result,"Returned true because of operation succeeds"),
+                ()->assertEquals(studentList.get(0),students.get(0),"The order should be like in sourse list"),
+                ()->assertEquals(studentList.get(1),students.get(1),"The order should be like in sourse list"),
+                ()->assertEquals(studentList.get(2),students.get(2),"The order should be like in sourse list")
+        );
     }
 
     @Test
-    void testToString() {
+    void containsAllFails() {
+        //given
+        Student valik = new Student(names[1],birthdays[2],details[3]);
+        Student vova = new Student(names[1],birthdays[1],details[1]);
+        Student petea = new Student(names[0],birthdays[0],details[0]);
+        students.add(valik);
+        students.add(vova);
+        StudentList studentList = new StudentList();
+        studentList.add(valik);
+        studentList.add(vova);
+        studentList.add(petea);
+        //when
+        boolean ifContainsAll= students.containsAll(studentList);
+        //then
+        assertFalse(ifContainsAll,"Because of students does not contains all StudentList,result is false");
     }
 
     @Test
-    void containsAll() {
+    void containsAllSucceeds() {
+        //given
+        Student valik = new Student(names[1],birthdays[2],details[3]);
+        Student vova = new Student(names[1],birthdays[1],details[1]);
+        Student petea = new Student(names[0],birthdays[0],details[0]);
+        students.add(valik);
+        students.add(vova);
+        StudentList studentList = new StudentList();
+        studentList.add(valik);
+        studentList.add(vova);
+        //when
+        boolean ifContainsAll= students.containsAll(studentList);
+        //then
+        assertTrue(ifContainsAll,"Because of students contains all StudentList,result is true");
+    }
+    @Test
+    void containsAllThrows() {
+        //given
+        Student valik = new Student(names[1],birthdays[2],details[3]);
+        Student vova = new Student(names[1],birthdays[1],details[1]);
+        students.add(valik);
+        students.add(vova);
+        StudentList studentList = null;
+        //when
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class,()->students.containsAll(studentList),
+                        "Exception should be thrown");
+        //then
+        assertEquals(exception.getMessage(),"Argument, passed to the method is null",
+                "Can't compare nulls");
     }
 
     @Test
-    void testAddAll() {
+    void containsAllWhenSecondListIsGreaterFails() {
+        //given
+        Student valik = new Student(names[1],birthdays[2],details[3]);
+        Student vova = new Student(names[1],birthdays[1],details[1]);
+        students.add(valik);
+        StudentList studentList = new StudentList();
+        studentList.add(valik);
+        studentList.add(vova);
+        //when
+        boolean result= students.containsAll(studentList);
+        //then
+        assertFalse(result,"List cannot contain other list,that is greater than it");
+    }
+    @Test
+    void testAddAllByIndex() {
+        //given
+        Student valik = new Student(names[1],birthdays[2],details[3]);
+        Student vova = new Student(names[1],birthdays[1],details[1]);
+        Student petea = new Student(names[0],birthdays[0],details[0]);
+        StudentList studentList = new StudentList();
+        studentList.add(valik);
+        studentList.add(vova);
+
+        students.add(petea);
+        //when
+        boolean result = students.addAll(0,studentList);
+        //then
+        assertTrue(studentList.get(0).equals(students.get(0)),
+                "StudentList added to Students and replaced elements in list to the right up two places");
     }
 
     @Test
-    void removeAll() {
+    void removeAllShouldWorkNice() {
+        //given
+        Student valik = new Student(names[1],birthdays[2],details[3]);
+        Student vova = new Student(names[1],birthdays[1],details[1]);
+        Student petea = new Student(names[0],birthdays[0],details[0]);
+        StudentList studentList = new StudentList();
+        studentList.add(valik);
+        studentList.add(vova);
+
+        students.add(valik);
+        students.add(vova);
+        students.add(null);
+        students.add(petea);
+        students.add(null);
+        //when
+        boolean result = students.removeAll(studentList);
+        //then
+        assertFalse(students.contains(valik),"Because it is removed, students does not contains this object");
+        assertFalse(students.contains(vova),"Because it is removed, students does not contains this object");
+    }
+    @Test
+    void removeAllWithNullArgumentWorksOk() {
+        //given
+        Student valik = new Student(names[1],birthdays[2],details[3]);
+        Student vova = new Student(names[1],birthdays[1],details[1]);
+        Student petea = new Student(names[0],birthdays[0],details[0]);
+        StudentList studentList = null;
+
+        students.add(valik);
+        students.add(vova);
+        students.add(null);
+        students.add(petea);
+        students.add(null);
+        //when
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class,()->students.removeAll(studentList),
+                        "Exception should be thrown");
+        //then
+        assertEquals(exception.getMessage(),"Argument, passed to the method is null",
+                "Argument, passed to the method is null");
     }
 
     @Test
-    void retainAll() {
+    void removeAllWithNullReferenceInArgumentWorksOk() {
+        //given
+        Student valik = new Student(names[1],birthdays[2],details[3]);
+        Student vova = new Student(names[1],birthdays[1],details[1]);
+        Student petea = new Student(names[0],birthdays[0],details[0]);
+        StudentList studentList = new StudentList();
+        studentList.add(valik);
+        studentList.add(null);
+        studentList.add(petea);
+
+        students.add(valik);
+        students.add(vova);
+        students.add(null);
+        students.add(petea);
+        students.add(null);
+        //when
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class,()->students.removeAll(studentList),
+                        "Exception should be thrown");
+        //then
+        assertEquals(exception.getMessage(),"Your collection contains a null reference",
+                "I have not possibility to compare nulls correctly,if I meet it, throw exception");
     }
 }
